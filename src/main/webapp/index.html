@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>juniper</title>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/lodash.min.js"></script>
+
+<script type="text/javascript">
+items = [];
+function updateList() {
+	$("#my-list").html("");
+	items.forEach(function (e) {
+		$("#my-list").append("<li>" + e + "</li>");
+	});
+}
+
+function getListItems() {
+	$.ajax({
+        url : 'todo',
+        dataType : 'json',
+        success : function(r) {
+        	console.log(r);
+        	items = r;
+        	console.log(items);
+        	updateList();
+        }
+    });
+}
+
+function sendListItem() {
+    var s = $("#texttosend").val();
+    
+    $.post("todo", { texttosend: s}, function() {
+    	getListItems();
+    });
+}
+
+$(document).ready(function () {	
+	$("#my-list").append("<li>test");
+	getListItems();
+	
+	$("#send-item").on('click', function () {
+		sendListItem();
+	});
+});
+</script>
+</head>
+<body>
+<h2>Todo List</h2>
+<p>
+<a href="todo">Todo Servlet</a>
+</p>
+
+<ul id="my-list"></ul>
+
+
+Enter your text: <input type="text" id="texttosend"><br>
+<button id="send-item" type="button" >Submit</button>
+
+</body>
+</html>
