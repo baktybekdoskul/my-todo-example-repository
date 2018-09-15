@@ -15,7 +15,8 @@ function updateList() {
 	$("#my-list").html("");
 	var i=0;
 	items.forEach(function (e) {
-		$("#my-list").append("<li>" + e + `<a href=# onclick="deleteItem(${i})"><i class="fas fa-backspace"></i></a><a href="#" onclick="editItem(${i})"><i class="fas fa-edit"></i></a></li>`);
+		var compiled = _.template('<li><%= it%><a href=# onclick="deleteItem(<%= index%>)"><i class="fas fa-backspace"></i></a><a href="#" onclick="editItem(<%= index%>)"><i class="fas fa-edit"></i></a></li>');
+		$("#my-list").append(compiled({'it': e, 'index': i}));
 		i++;
 	});
 }
@@ -32,21 +33,34 @@ function getListItems() {
         }
     });
 }
+function isVal(text){
+	var pattern=/\d/g;
+	var res = text.match(pattern);
+	if(res == null){
+		return true;
+	}
+	alert("you can not add number in your text!!!");
+	return false;
+	//if()
+}
 
 function sendListItem() {
 	var s = $("#texttosend").val();
-	if(editMode){
-		$.post("todo", { action:"edit" ,texttoedit: s, editIndex: editInd}, function() {
-	    	getListItems();
-	    });	
-		editMode = false;
-		editInd = null;
-	}else{
-		$.post("todo", { action:"add" ,texttosend: s}, function() {
-	    	getListItems();
-	    });	
+	if(isVal(s)){
+		if(editMode){
+			$.post("todo", { action:"edit" ,texttoedit: s, editIndex: editInd}, function() {
+		    	getListItems();
+		    });	
+			editMode = false;
+			editInd = null;
+		}else{
+			$.post("todo", { action:"add" ,texttosend: s}, function() {
+		    	getListItems();
+		    });	
+		}
+		$("#texttosend").val("");	
 	}
-	$("#texttosend").val("");
+	
 	
 }
 
