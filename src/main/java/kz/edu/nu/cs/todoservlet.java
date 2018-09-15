@@ -34,8 +34,18 @@ public class todoservlet extends HttpServlet {
 
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	    String myText = request.getParameter("texttosend");
-	    list.add(myText);
+	    if(request.getParameter("action").equals("add")) {
+	    	String myText = request.getParameter("texttosend");
+		    list.add(myText);
+	    } else if(request.getParameter("action").equals("delete")) {
+	    	int delInd = Integer.parseInt(request.getParameter("deleteIndex"));
+			list.remove(delInd);
+	    } else if(request.getParameter("action").equals("edit")) {
+	    	int editInd = Integer.parseInt(request.getParameter("editIndex"));
+	    	String myText = request.getParameter("texttoedit");
+			list.set(editInd, myText);
+	    }
+		
 	}
-
+	
 }

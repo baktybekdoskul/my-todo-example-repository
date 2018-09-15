@@ -5,13 +5,18 @@
 <title>juniper</title>
 <script src="scripts/jquery.min.js"></script>
 <script src="scripts/lodash.min.js"></script>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 
 <script type="text/javascript">
 items = [];
+editMode = false;
+editInd = null;
 function updateList() {
 	$("#my-list").html("");
+	var i=0;
 	items.forEach(function (e) {
-		$("#my-list").append("<li>" + e + "</li>");
+		$("#my-list").append("<li>" + e + `<a href=# onclick="deleteItem(${i})"><i class="fas fa-backspace"></i></a><a href="#" onclick="editItem(${i})"><i class="fas fa-edit"></i></a></li>`);
+		i++;
 	});
 }
 
@@ -29,11 +34,35 @@ function getListItems() {
 }
 
 function sendListItem() {
-    var s = $("#texttosend").val();
-    
-    $.post("todo", { texttosend: s}, function() {
-    	getListItems();
-    });
+	var s = $("#texttosend").val();
+	if(editMode){
+		$.post("todo", { action:"edit" ,texttoedit: s, editIndex: editInd}, function() {
+	    	getListItems();
+	    });	
+		editMode = false;
+		editInd = null;
+	}else{
+		$.post("todo", { action:"add" ,texttosend: s}, function() {
+	    	getListItems();
+	    });	
+	}
+	$("#texttosend").val("");
+	
+}
+
+function deleteItem(ind) {
+	
+	//console.log("heeyy " + emp); 
+	$.post("todo", {action:"delete", deleteIndex: ind}, function(){
+		getListItems();
+	});
+}
+
+function editItem(ind) {
+	var itemText = items[ind];
+	editMode = true;
+	editInd = ind;
+	$("#texttosend").val(itemText);
 }
 
 $(document).ready(function () {	
@@ -53,8 +82,6 @@ $(document).ready(function () {
 </p>
 
 <ul id="my-list"></ul>
-
-
 Enter your text: <input type="text" id="texttosend"><br>
 <button id="send-item" type="button" >Submit</button>
 
